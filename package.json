@@ -11,6 +11,7 @@
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
     "axios": "^1.6.0",
+    "commitlint": "^21.2.2",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0"
   },
