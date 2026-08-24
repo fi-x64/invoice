@@ -15,7 +15,14 @@
     "skipDefaultLibCheck": true,
     "strict": false,
     "paths": {
-      "@common/contants/*": ["./libs/contants/src/lib/*"]
+      "@common/constants/*": ["./libs/constants/src/lib/*"],
+      "@common/configuration/*": ["./libs/configuration/src/lib/*"],
+      "@common/middlewares/*": ["./libs/middleware/src/lib/*"],
+      "@common/utils/*": ["./libs/utils/src/lib/*"],
+      "@common/interfaces/*": ["./libs/interfaces/src/lib/*"],
+      "@common/interceptors/*": ["./libs/interceptors/src/lib/*"],
+      "@common/decorators/*": ["./libs/decorators/src/lib/*"],
+      "@common/schemas/*": ["./libs/schema/src/lib/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
