@@ -5,9 +5,11 @@ import { Response } from '@common/interfaces/tcp/common/response.interface';
 import { CreateInvoiceTcpRequest, InvoiceTcpResponse } from '@common/interfaces/tcp/invoice';
 import { Controller, UseInterceptors } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+import { ApiTags } from '@nestjs/swagger';
 import { InvoiceService } from '../services/invoice.service';
 
-@Controller()
+@ApiTags('Invoice')
+@Controller('invoice')
 @UseInterceptors(TcpLoggingInterceptor)
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
