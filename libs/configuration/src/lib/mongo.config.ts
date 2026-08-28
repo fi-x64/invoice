@@ -1,63 +1,36 @@
+import { Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-
-type MongoConfigurationInput = Partial<MongoConfiguration> & {
-  MONGO_URL?: string;
-  MONGO_DB_NAME?: string;
-  MONGO_POOL_SIZE?: number | string;
-  MONGO_CONNECTION_TIMEOUT_MS?: number | string;
-  MONGO_SOCKET_TIMEOUT_MS?: number | string;
-};
+import { Connection } from 'mongoose';
 
 export class MongoConfiguration {
-  private static readonly env = process.env;
+  @IsString()
+  @IsNotEmpty()
+  URL: string;
 
   @IsString()
   @IsNotEmpty()
-  URL!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  DB_NAME!: string;
+  DB_NAME: string;
 
   @IsNumber()
   @IsOptional()
-  POOL_SIZE!: number;
+  POOL_SIZE?: number;
 
   @IsNumber()
   @IsOptional()
-  CONNECTION_TIMEOUT_MS!: number;
+  CONNECT_TIMEOUT_MS?: number;
 
   @IsNumber()
   @IsOptional()
-  SOCKET_TIMEOUT_MS!: number;
+  SOCKET_TIMEOUT_MS?: number;
 
-  constructor(data?: MongoConfigurationInput) {
-    this.URL = data?.URL || data?.MONGO_URL || MongoConfiguration.env['MONGO_URL'] || 'mongodb://localhost:27017';
-    this.DB_NAME = data?.DB_NAME || data?.MONGO_DB_NAME || MongoConfiguration.env['MONGO_DB_NAME'] || 'test';
-    this.POOL_SIZE = MongoConfiguration.parseNumber(
-      data?.POOL_SIZE ?? data?.MONGO_POOL_SIZE ?? MongoConfiguration.env['MONGO_POOL_SIZE'],
-      10,
-    );
-    this.CONNECTION_TIMEOUT_MS = MongoConfiguration.parseNumber(
-      data?.CONNECTION_TIMEOUT_MS ??
-        data?.MONGO_CONNECTION_TIMEOUT_MS ??
-        MongoConfiguration.env['MONGO_CONNECTION_TIMEOUT_MS'],
-      30000,
-    );
-    this.SOCKET_TIMEOUT_MS = MongoConfiguration.parseNumber(
-      data?.SOCKET_TIMEOUT_MS ?? data?.MONGO_SOCKET_TIMEOUT_MS ?? MongoConfiguration.env['MONGO_SOCKET_TIMEOUT_MS'],
-      30000,
-    );
-  }
-
-  private static parseNumber(value: number | string | undefined, fallback: number): number {
-    if (value === undefined || value === '') {
-      return fallback;
-    }
-
-    return Number(value);
+  constructor(data?: Partial<MongoConfiguration>) {
+    this.URL = data?.URL || process.env['MONGODB_URI'] || '';
+    this.DB_NAME = data?.DB_NAME || process.env['MONGODB_DB_NAME'] || '';
+    this.POOL_SIZE = data?.POOL_SIZE || Number(process.env['MONGODB_POOL_SIZE']) || 10;
+    this.CONNECT_TIMEOUT_MS = data?.CONNECT_TIMEOUT_MS || Number(process.env['MONGODB_CONNECT_TIMEOUT_MS']) || 15000;
+    this.SOCKET_TIMEOUT_MS = data?.SOCKET_TIMEOUT_MS || Number(process.env['MONGODB_SOCKET_TIMEOUT_MS']) || 360000;
   }
 }
 
@@ -65,27 +38,17 @@ export const MongoProvider = MongooseModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
   useFactory: async (configService: ConfigService) => ({
-    uri: configService.get<string>('MONGO_CONFIG.URL', 'mongodb://localhost:27017'),
-    dbName: configService.get<string>('MONGO_CONFIG.DB_NAME', 'test'),
-    maxPoolSize: configService.get<number>('MONGO_CONFIG.POOL_SIZE', 10),
-    connectTimeoutMS: configService.get<number>('MONGO_CONFIG.CONNECTION_TIMEOUT_MS', 30000),
-    socketTimeoutMS: configService.get<number>('MONGO_CONFIG.SOCKET_TIMEOUT_MS', 30000),
-    onConnectionCreate: (connection) => {
-      connection.on('error', (err) => {
-        console.error('MongoDB connection error:', err);
-      });
-      connection.on('disconnected', () => {
-        console.warn('MongoDB connection disconnected');
-      });
-      connection.on('reconnected', () => {
-        console.info('MongoDB connection reconnected');
-      });
-      connection.on('disconnecting', () => {
-        console.warn('MongoDB connection disconnecting');
-      });
-      connection.on('close', () => {
-        console.info('MongoDB connection closed');
-      });
+    uri: configService.get('MONGO_CONFIG.URL'),
+    dbName: configService.get('MONGO_CONFIG.DB_NAME'),
+    maxPoolSize: configService.get('MONGO_CONFIG.POOL_SIZE'),
+    connectTimeoutMS: configService.get('MONGO_CONFIG.CONNECT_TIMEOUT_MS'),
+    socketTimeoutMS: configService.get('MONGO_CONFIG.SOCKET_TIMEOUT_MS'),
+    onConnectionCreate: (connection: Connection) => {
+      connection.on('connected', () => Logger.log(' 🟢   🟢   🟢   >>  connected'));
+      connection.on('open', () => Logger.log(' 🟢   🟢   🟢   >>  open'));
+      connection.on('disconnected', () => Logger.log(' 🪓   🪓   🪓   >>  disconnected'));
+      connection.on('reconnected', () => Logger.log(' 🧡   🧡   🧡   >>  reconnected'));
+      connection.on('disconnecting', () => Logger.log(' 🪓   🪓   🪓   >>  disconnecting'));
 
       return connection;
     },
