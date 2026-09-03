@@ -10,6 +10,8 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
@@ -23,7 +25,8 @@
       "@common/interceptors/*": ["./libs/interceptors/src/lib/*"],
       "@common/decorators/*": ["./libs/decorators/src/lib/*"],
       "@common/schemas/*": ["./libs/schema/src/lib/*"],
-      "@common/entities/*": ["./libs/entities/src/lib/*"]
+      "@common/entities/*": ["./libs/entities/src/lib/*"],
+      "@common/guards/*": ["./libs/guards/src/lib/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

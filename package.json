@@ -7,7 +7,7 @@
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
     "dev": "npm run nx:reset && npm run nx:run-many -- -t serve",
-    "dev-lite": "npm run dev -- --projects=bff"
+    "dev-lite": "npm run dev -- --projects=bff,user-access,authorizer,invoice"
   },
   "private": true,
   "dependencies": {
@@ -19,11 +19,13 @@
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/swagger": "^11.4.7",
     "@nestjs/typeorm": "^11.0.3",
-    "axios": "^1.6.0",
+    "axios": "^1.20.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "commitlint": "^21.2.2",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^4.1.0",
     "mongodb": "^6.21.0",
     "mongoose": "^9.9.3",
     "pg": "^8.23.0",
@@ -48,6 +50,7 @@
     "@swc/helpers": "~0.5.18",
     "@types/express": "^4.17.25",
     "@types/jest": "~30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.0.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
