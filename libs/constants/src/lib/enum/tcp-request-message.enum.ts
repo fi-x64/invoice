@@ -3,8 +3,6 @@ enum INVOICE {
   GET_BY_ID = 'invoice.get_by_id',
   UPDATE_BY_ID = 'invoice.update_by_id',
   DELETE_BY_ID = 'invoice.delete_by_id',
-  SEND = 'invoice.send',
-  UPDATE_INVOICE_PAID = 'invoice.update_invoice_paid',
 }
 
 enum PRODUCT {
@@ -15,6 +13,7 @@ enum PRODUCT {
 enum USER {
   CREATE = 'user.create',
   GET_ALL = 'user.get_all',
+  GET_BY_USER_ID = 'user.get_by_user_id',
 }
 
 enum KEYCLOAK {
@@ -22,7 +21,7 @@ enum KEYCLOAK {
 }
 
 enum AUTHORIZER {
-  LOGIN = 'authorizer_login',
+  LOGIN = 'authorizer.login',
   VERIFY_USER_TOKEN = 'authorizer.verify_user_token',
 }
 

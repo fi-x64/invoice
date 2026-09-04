@@ -1,6 +1,6 @@
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
-import { ProcessId } from '@common/decorators/processid.decorator';
+import { ProcessId } from '@common/decorators/processId.decorator';
 import { LoginRequestDto, LoginResponseDto } from '@common/interfaces/gateway/authorizer';
 import { ResponseDto } from '@common/interfaces/gateway/response.interfaces';
 import { LoginTcpRequest, LoginTcpResponse } from '@common/interfaces/tcp/authorizer';

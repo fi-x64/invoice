@@ -1,7 +1,7 @@
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { Authorization } from '@common/decorators/authorizer.decorator';
-import { ProcessId } from '@common/decorators/processid.decorator';
+import { ProcessId } from '@common/decorators/processId.decorator';
 import { ResponseDto } from '@common/interfaces/gateway/response.interfaces';
 import { CreateUserRequestDto } from '@common/interfaces/gateway/user';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';

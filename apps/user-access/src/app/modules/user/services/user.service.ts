@@ -33,6 +33,10 @@ export class UserService {
     return this.userRepository.create(input);
   }
 
+  getByUserIdOrEmail(params: { userId?: string; email?: string }) {
+    return this.userRepository.getByUserIdOrEmail(params);
+  }
+
   createKeycloakUser(data: CreateKeycloakUserTcpReq, processId: string) {
     return firstValueFrom(
       this.authorizeclient

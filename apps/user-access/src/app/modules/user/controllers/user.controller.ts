@@ -1,6 +1,6 @@
 import { HTTP_MESSAGE } from '@common/constants/enum/http-message.enum';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
-import { ProcessId } from '@common/decorators/processid.decorator';
+import { ProcessId } from '@common/decorators/processId.decorator';
 import { RequestParams } from '@common/decorators/request.param.decorator';
 import { TcpLoggingInterceptor } from '@common/interceptors/tcpLogging.interceptor';
 import { Response } from '@common/interfaces/tcp/common/response.interface';
@@ -18,5 +18,11 @@ export class UserController {
   async create(@RequestParams() data: CreateUserTcpRequest, @ProcessId() processId: string) {
     await this.userService.create(data, processId);
     return Response.success<string>(HTTP_MESSAGE.CREATED);
+  }
+
+  @MessagePattern(TCP_REQUEST_MESSAGE.USER.GET_BY_USER_ID)
+  async getByUserId(@RequestParams() params: { userId?: string; email?: string }) {
+    const user = await this.userService.getByUserIdOrEmail(params);
+    return Response.success(user);
   }
 }

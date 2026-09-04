@@ -1,12 +1,16 @@
 import { TCP_SERVICES } from '@common/configuration/tcp.config';
+import { PERMISSION } from '@common/constants/enum/role.enum';
 import { TCP_REQUEST_MESSAGE } from '@common/constants/enum/tcp-request-message.enum';
 import { Authorization } from '@common/decorators/authorizer.decorator';
-import { ProcessId } from '@common/decorators/processid.decorator';
+import { Permissions } from '@common/decorators/permission.decorator';
+import { ProcessId } from '@common/decorators/processId.decorator';
+import { UserData } from '@common/decorators/userData.decorator';
 import { CreateInvoiceRequestDto, InvoiceResponseDto } from '@common/interfaces/gateway/invoice';
 import { ResponseDto } from '@common/interfaces/gateway/response.interfaces';
+import { AuthorizedMetadata } from '@common/interfaces/tcp/authorizer';
 import { TcpClient } from '@common/interfaces/tcp/common/tcp-client.interface';
 import { CreateInvoiceTcpRequest, InvoiceTcpResponse } from '@common/interfaces/tcp/invoice';
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Logger, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { map } from 'rxjs';
 
@@ -19,13 +23,19 @@ export class InvoiceController {
   @ApiOkResponse({ type: ResponseDto<InvoiceResponseDto> })
   @ApiOperation({ summary: 'Create a new invoice' })
   @Authorization({ secured: true })
-  create(@Body() body: CreateInvoiceRequestDto, @ProcessId() processId: string) {
+  @Permissions([PERMISSION.INVOICE_CREATE, PERMISSION.INVOICE_GET_BY_ID])
+  create(
+    @Body() body: CreateInvoiceRequestDto,
+    @ProcessId() processId: string,
+    @UserData() userData: AuthorizedMetadata,
+  ) {
+    Logger.debug('User data', userData);
+
     return this.invoiceClient
-      .send<InvoiceTcpResponse, CreateInvoiceTcpRequest>(TCP_REQUEST_MESSAGE.INVOICE.CREATE, { data: body, processId })
-      .pipe(
-        map(
-          (response) => new ResponseDto<InvoiceTcpResponse>({ data: response.data, statusCode: response.statusCode }),
-        ),
-      );
+      .send<InvoiceTcpResponse, CreateInvoiceTcpRequest>(TCP_REQUEST_MESSAGE.INVOICE.CREATE, {
+        data: body,
+        processId,
+      })
+      .pipe(map((data) => new ResponseDto(data)));
   }
 }

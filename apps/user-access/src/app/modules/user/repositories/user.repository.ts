@@ -18,6 +18,18 @@ export class UserRepository {
     return this.userModel.findOne({ userId }).populate('roles').exec();
   }
 
+  getByUserIdOrEmail(params: { userId?: string; email?: string }) {
+    const conditions = [{ userId: params.userId }, { email: params.email }].filter(
+      (condition) => Object.values(condition)[0],
+    );
+
+    if (!conditions.length) {
+      return null;
+    }
+
+    return this.userModel.findOne({ $or: conditions }).populate('roles').exec();
+  }
+
   getByEmail(email: string) {
     return this.userModel.findOne({ email }).exec();
   }

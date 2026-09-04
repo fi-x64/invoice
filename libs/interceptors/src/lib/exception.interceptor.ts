@@ -8,32 +8,21 @@ import { catchError, map, Observable } from 'rxjs';
 export class ExceptionInterceptor implements NestInterceptor {
   private readonly logger = new Logger(ExceptionInterceptor.name);
 
-  intercept(context: ExecutionContext, next: CallHandler<unknown>): Observable<unknown> | Promise<Observable<unknown>> {
+  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     const ctx = context.switchToHttp();
     const request: Request & { [MetadataKeys.PROCESS_ID]: string; [MetadataKeys.START_TIME]: number } =
       ctx.getRequest();
 
-    const processId = request[MetadataKeys.PROCESS_ID];
+    const processID = request[MetadataKeys.PROCESS_ID];
     const startTime = request[MetadataKeys.START_TIME];
 
     return next.handle().pipe(
-      map((data: unknown) => {
+      map((data: ResponseDto<unknown>) => {
         const durationMs = Date.now() - startTime;
+        data.processID = processID;
+        data.duration = `${durationMs} ms`;
 
-        if (data instanceof ResponseDto) {
-          data.message = data.message ?? HTTP_MESSAGE.OK;
-          data.processID = processId;
-          data.duration = `${durationMs} ms`;
-
-          return data;
-        }
-
-        return new ResponseDto({
-          data,
-          message: HTTP_MESSAGE.OK,
-          processID: processId,
-          duration: `${durationMs} ms`,
-        });
+        return data;
       }),
       catchError((error) => {
         this.logger.error({ error });
@@ -41,39 +30,13 @@ export class ExceptionInterceptor implements NestInterceptor {
         const durationMs = Date.now() - startTime;
 
         const message = error?.response?.message || error?.message || error || HTTP_MESSAGE.INTERNAL_SERVER_ERROR;
-        const statusCode = this.getHttpStatus(error);
+        const code = error?.code || error.statusCode || error?.response?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
 
         throw new HttpException(
-          new ResponseDto({
-            data: null,
-            message,
-            processID: processId,
-            statusCode,
-            duration: `${durationMs} ms`,
-          }),
-          statusCode,
+          new ResponseDto({ data: null, message, statusCode: code, duration: `${durationMs} ms`, processID }),
+          code,
         );
       }),
     );
-  }
-
-  private getHttpStatus(error: unknown): number {
-    const errorLike = error as {
-      code?: unknown;
-      response?: { statusCode?: unknown };
-      status?: unknown;
-      statusCode?: unknown;
-    };
-    const statusCode = errorLike.statusCode ?? errorLike.status ?? errorLike.response?.statusCode;
-
-    if (typeof statusCode === 'number') {
-      return statusCode;
-    }
-
-    if (typeof errorLike.code === 'string') {
-      return HttpStatus.SERVICE_UNAVAILABLE;
-    }
-
-    return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 }
