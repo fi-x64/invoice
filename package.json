@@ -7,7 +7,7 @@
     "nx:reset": "nx reset",
     "nx:run-many": "nx run-many",
     "dev": "npm run nx:reset && npm run nx:run-many -- -t serve",
-    "dev-lite": "npm run dev -- --projects=bff,user-access,authorizer,invoice"
+    "dev-lite": "npm run dev -- --projects=bff,user-access,authorizer,invoice,pdf-generator"
   },
   "private": true,
   "dependencies": {
@@ -25,6 +25,7 @@
     "@nestjs/swagger": "^11.4.7",
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/typeorm": "^11.0.3",
+    "@types/ejs": "^3.1.5",
     "axios": "^1.20.0",
     "cache-manager": "^7.2.9",
     "class-transformer": "^0.5.1",
@@ -36,6 +37,7 @@
     "mongodb": "^6.21.0",
     "mongoose": "^9.9.3",
     "pg": "^8.23.0",
+    "puppeteer": "^25.10.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0",
     "typeorm": "^0.3.31",

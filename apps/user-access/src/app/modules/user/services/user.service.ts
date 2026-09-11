@@ -13,13 +13,13 @@ import { UserRepository } from '../repositories/user.repository';
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
-    @Inject(TCP_SERVICES.AUTHORIZER_SERVICE) private readonly authorizeclient: TcpClient,
+    @Inject(TCP_SERVICES.AUTHORIZER_SERVICE) private readonly authorizerClient: TcpClient,
   ) {}
 
   async create(params: CreateUserTcpRequest, processId: string) {
-    const isExist = await this.userRepository.exists(params.email);
+    const isExists = await this.userRepository.exists(params.email);
 
-    if (isExist) {
+    if (isExists) {
       throw new BadRequestException(ERROR_CODE.USER_ALREADY_EXISTS);
     }
 
@@ -33,14 +33,13 @@ export class UserService {
     return this.userRepository.create(input);
   }
 
-  getByUserIdOrEmail(params: { userId?: string; email?: string }) {
-    return this.userRepository.getByUserIdOrEmail(params);
-  }
-
   createKeycloakUser(data: CreateKeycloakUserTcpReq, processId: string) {
     return firstValueFrom(
-      this.authorizeclient
-        .send<string>(TCP_REQUEST_MESSAGE.KEYCLOAK.CREATE_USER, { data, processId })
+      this.authorizerClient
+        .send<string>(TCP_REQUEST_MESSAGE.KEYCLOAK.CREATE_USER, {
+          data,
+          processId,
+        })
         .pipe(map((data) => data.data)),
     );
   }
